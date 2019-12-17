@@ -1,0 +1,53 @@
+<html>
+<head>
+    <title>My Frontend Framework</title>
+</head>
+<body>
+<div id="container">
+</div>
+<script>
+    // An object to store all the data
+    const context = {};
+
+    function bindSPAListeners() {
+        /*
+        Write your code here
+         */
+        document.querySelectorAll('[bit-data]').forEach(elem => {
+            const dataName = elem.getAttribute('bit-data');
+            if (context[dataName]) { // THIS IS NEW
+                elem.value = context[dataName];
+            }
+            elem.addEventListener('keyup', event => {
+                context[dataName] = event.currentTarget.value;
+                render();
+            });
+        });
+
+        function render() {
+            document.querySelectorAll('[bit-data-bind]').forEach(elem => {
+                const dataName = elem.getAttribute('bit-data-bind');
+                elem.innerText = context[dataName] ? context[dataName] : '';
+            });
+        }
+        render(); // THIS IS NEW
+    }
+
+    function switchToRoute(route) {
+        location.hash = route;
+        fetch(route + '.html').then(result => {
+            result.text().then(text => {
+                document.querySelector('#container').innerHTML = text;
+                bindSPAListeners();
+            })
+        });
+    }
+
+    if (location.hash) {
+        switchToRoute(location.hash.replace('#', ''));
+    } else {
+        switchToRoute('form');
+    }
+</script>
+</body>
+</html>
